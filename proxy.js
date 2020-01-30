@@ -1,6 +1,7 @@
 var AWS = require('aws-sdk');
 var http = require('http');
 var express = require('express');
+var auth = require('./auth');
 var bodyParser = require('body-parser');
 
 function run(config) {
@@ -26,6 +27,7 @@ function run(config) {
 
   // Setup express
   var app = express();
+  app.use(auth)
   app.use(bodyParser.raw({type: '*/*', limit: process.env.BODY_LIMIT || '10mb'}));
   app.use(getcreds);
 
