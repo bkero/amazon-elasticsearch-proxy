@@ -9,32 +9,24 @@ Sets up a proxy for signing requests with IAM credentials to access Amazon Elast
 ## Installation
 
 ```shell
-> npm install -g amazon-elasticsearch-proxy
+> npm install .
 ```
-
-It is also available as a docker image in [DockerHub](https://hub.docker.com/r/lindstrom/amazon-elasticsearch-proxy)
 
 ## Usage
 
 Start the proxy with (make sure you have AWS Credentials loaded into your shell):
 
 ```shell
-> amazon-elasticsearch-proxy your-amazon-elasticsearch-endpoint
+> ENDPOINT=endpoint USERNAME=username PASSWORD=hunter2 PORT=9200 BINDADDRESS=0.0.0.0 amazon-elasticsearch-proxy
 ```
 
 You can also use the docker image like this:
 
 ```shell
-> docker run -v ~/.aws:/root/.aws:ro -p 9200:9200 -e AWS_PROFILE=production lindstrom/amazon-elasticsearch-proxy my-elastic-search-endpoint.us-east-1.es.amazonaws.com
+> docker run -v ~/.aws:/root/.aws:ro -p 9200:9200 -e AWS_PROFILE=production -e ENDPOINT=endpoint -e USERNAME=username -e PASSWORD=hunter2 -e PORT=9200 -e BINDADDRESS=0.0.0.0 amazon-elasticsearch-proxy
 ```
 
-There are three details that are very important here. 
-
-* `-v` You will need to mount your AWS credentials directory as readonly volume within docker so that AWS SDK can access services.
-* `-p` Innternally, the proxy is hard coded to run on port 9200 but you should map to any port of your liking or it won't work.
-* `-e` Environment variables that AWS SDK expects. Standard ones, usually all of those work: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
-
-An example would be that you have an ES domain in proudction environemnt which has access to an IAM role named `analytics` and this is the access policy 
+An example would be that you have an ES domain in production environemnt which has access to an IAM role named `analytics` and this is the access policy 
 for the domain:
 
 ```json
@@ -67,7 +59,7 @@ source_profile = production
 Then you can simply run this command:
 
 ```shell
-> docker run -v ~/.aws:/root/.aws:ro -p 9200:9200 -e AWS_PROFILE=analytics_profile amazon-elasticsearch-proxy search-analytics-somerandomstringw.us-east-1.es.amazonaws.com
+> docker run -v ~/.aws:/root/.aws:ro -p 9200:9200 -e AWS_PROFILE=analytics_profile -e ENDPOINT=endpoint -e USERNAME=username -e PASSWORD=hunter2 -e PORT=9200 -e BINDADDRESS=0.0.0.0 amazon-elasticsearch-proxy
 ```
 
 After that, the AWS SDK will pick up the `analytics_profile`, will use the credentials of `production` profile to assume the role `analytics` and requests would be 
